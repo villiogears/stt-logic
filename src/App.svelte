@@ -2,7 +2,19 @@
 	import { onMount, onDestroy } from 'svelte';
 	let transcript = '';
 	let recognizing = false;
-	let recognition: SpeechRecognition | null = null;
+
+	type BrowserSpeechRecognition = {
+		lang: string;
+		continuous: boolean;
+		interimResults: boolean;
+		onresult: ((event: any) => void) | null;
+		onstart: (() => void) | null;
+		onend: (() => void) | null;
+		start: () => void;
+		stop: () => void;
+	};
+
+	let recognition: BrowserSpeechRecognition | null = null;
 	let appContainer: HTMLElement | null = null;
 	let isFullscreenMode = false;
 
@@ -56,12 +68,13 @@
 			transcript = 'Web Speech APIはこのブラウザでサポートされていません。';
 			return;
 		}
-		recognition = new SpeechRecognitionCtor();
-		recognition.lang = 'ja-JP';
-		recognition.continuous = true;
-		recognition.interimResults = true;
+		const recognitionInstance: BrowserSpeechRecognition = new SpeechRecognitionCtor();
+		recognition = recognitionInstance;
+		recognitionInstance.lang = 'ja-JP';
+		recognitionInstance.continuous = true;
+		recognitionInstance.interimResults = true;
 
-		recognition.onresult = (event: any) => {
+		recognitionInstance.onresult = (event: any) => {
 			let interim = '';
 			const now = Date.now();
 			// 3秒以上空いていたら上書き
@@ -82,11 +95,11 @@
 			displayText = transcript + interim;
 		};
 
-		recognition.onstart = () => {
+		recognitionInstance.onstart = () => {
 			recognizing = true;
 			resetSilenceTimer();
 		};
-		recognition.onend = () => {
+		recognitionInstance.onend = () => {
 			recognizing = false;
 			if (silenceTimeout) clearTimeout(silenceTimeout);
 		};
