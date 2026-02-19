@@ -92,15 +92,77 @@
 	}
 </script>
 
-<main>
-	<h1>音声認識デモ（Web Speech API）</h1>
-	<button on:click={startRecognition} disabled={recognizing}>開始</button>
-	<button on:click={stopRecognition} disabled={!recognizing}>停止</button>
-	<div style="margin-top:1em; padding:1em; border:1px solid #ccc; min-height:3em; background:#fafafa;">
-		{#if displayText}
-			<span style="color: #000;">{displayText}</span>
-		{:else}
-			<span style="color:#888;">ここに音声が文字起こしされます</span>
+<main style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
+	<div style="max-width: 600px; width: 90%; padding: 2rem;">
+		<h1 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 700; text-align: center; background: linear-gradient(135deg, #00d4ff, #0099ff); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">音声認識デモ</h1>
+		<p style="text-align: center; color: #b0b0b0; margin-bottom: 2rem; font-size: 0.95rem;">Web Speech API</p>
+		
+		<div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center;">
+			<button 
+				on:click={startRecognition} 
+				disabled={recognizing}
+				style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #00d4ff, #0099ff); color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 1rem; box-shadow: 0 4px 15px rgba(0, 212, 255, 0.3);"
+               
+			>
+				開始
+			</button>
+			<button 
+				on:click={stopRecognition} 
+				disabled={!recognizing}
+				style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: #fff; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 1rem; box-shadow: 0 4px 15px rgba(255, 107, 107, 0.3);"
+               
+			>
+				停止
+			</button>
+		</div>
+
+		<div style="margin-top: 1.5rem; padding: 1.5rem; border: 2px solid #00d4ff; border-radius: 0.75rem; min-height: 8rem; background: rgba(0, 212, 255, 0.05); backdrop-filter: blur(10px); box-shadow: 0 8px 32px rgba(0, 212, 255, 0.1);">
+			{#if displayText}
+				<span style="color: #00d4ff; font-size: 1.1rem; line-height: 1.8; word-wrap: break-word;">{displayText}</span>
+			{:else}
+				<span style="color: #5a5a7a; font-style: italic;">ここに音声が文字起こしされます</span>
+			{/if}
+		</div>
+
+		{#if recognizing}
+			<div style="margin-top: 1.5rem; text-align: center;">
+				<div style="display: inline-block; width: 12px; height: 12px; background: #00d4ff; border-radius: 50%; animation: pulse 1.5s infinite; box-shadow: 0 0 20px rgba(0, 212, 255, 0.7);"></div>
+				<p style="color: #00d4ff; margin-top: 0.5rem; font-size: 0.9rem;">リッスン中...</p>
+			</div>
 		{/if}
 	</div>
 </main>
+
+<style>
+	:global(body) {
+		margin: 0;
+		padding: 0;
+		background: #0f0f1e;
+	}
+
+	@keyframes pulse {
+		0%, 100% {
+			opacity: 1;
+			transform: scale(1);
+		}
+		50% {
+			opacity: 0.5;
+			transform: scale(1.2);
+		}
+	}
+
+	button:disabled {
+		opacity: 0.5;
+		cursor: not-allowed !important;
+	}
+</style>
+
+button:not(:disabled):hover {
+	transform: translate(0, -2px);
+}
+button:not(:disabled):hover[style*='#00d4ff'] {
+	box-shadow: 0 6px 20px rgba(0, 212, 255, 0.5);
+}
+button:not(:disabled):hover[style*='#ff6b6b'] {
+	box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
+}
