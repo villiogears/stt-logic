@@ -6,8 +6,10 @@
 	let recognition: SpeechRecognition | null = null;
 
 	// 型定義
-	type SpeechRecognition = typeof window.SpeechRecognition;
-	type SpeechRecognitionInstance = InstanceType<SpeechRecognition>;
+	type SpeechRecognitionType = typeof window & {
+		SpeechRecognition?: any;
+		webkitSpeechRecognition?: any;
+	};
 
 
 	// 3秒以上空いたら次の音声で上書きするためのタイマー
@@ -24,19 +26,20 @@
 		}, 3000);
 	}
 
+
 	onMount(() => {
-		const SpeechRecognition =
+		const SpeechRecognitionCtor =
 			(window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
-		if (!SpeechRecognition) {
+		if (!SpeechRecognitionCtor) {
 			transcript = 'Web Speech APIはこのブラウザでサポートされていません。';
 			return;
 		}
-		recognition = new SpeechRecognition();
+		recognition = new SpeechRecognitionCtor();
 		recognition.lang = 'ja-JP';
 		recognition.continuous = true;
 		recognition.interimResults = true;
 
-		recognition.onresult = (event: SpeechRecognitionEvent) => {
+		recognition.onresult = (event: any) => {
 			let interim = '';
 			const now = Date.now();
 			// 3秒以上空いていたら上書き
@@ -54,8 +57,7 @@
 					interim += result[0].transcript;
 				}
 			}
-			// 一時結果も表示
-			$: displayText = transcript + interim;
+			displayText = transcript + interim;
 		};
 
 		recognition.onstart = () => {
