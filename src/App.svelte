@@ -155,7 +155,6 @@
 		opacity: 0.5;
 		cursor: not-allowed !important;
 	}
-</style>
 
 button:not(:disabled):hover {
 	transform: translate(0, -2px);
@@ -166,3 +165,5 @@ button:not(:disabled):hover[style*='#00d4ff'] {
 button:not(:disabled):hover[style*='#ff6b6b'] {
 	box-shadow: 0 6px 20px rgba(255, 107, 107, 0.5);
 }
+
+</style>	
