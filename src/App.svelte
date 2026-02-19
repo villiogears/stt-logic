@@ -19,6 +19,8 @@
 		if (silenceTimeout) clearTimeout(silenceTimeout);
 		silenceTimeout = setTimeout(() => {
 			overwriteNext = true;
+			transcript = '';
+			displayText = '';
 		}, 3000);
 	}
 
