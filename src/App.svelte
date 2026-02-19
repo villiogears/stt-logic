@@ -71,7 +71,7 @@
 	<button on:click={stopRecognition} disabled={!recognizing}>停止</button>
 	<div style="margin-top:1em; padding:1em; border:1px solid #ccc; min-height:3em; background:#fafafa;">
 		{#if displayText}
-			<span>{displayText}</span>
+			<span style="color: #000;">{displayText}</span>
 		{:else}
 			<span style="color:#888;">ここに音声が文字起こしされます</span>
 		{/if}
