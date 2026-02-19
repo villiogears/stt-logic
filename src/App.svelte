@@ -9,6 +9,19 @@
 	type SpeechRecognition = typeof window.SpeechRecognition;
 	type SpeechRecognitionInstance = InstanceType<SpeechRecognition>;
 
+
+	// 3秒以上空いたら次の音声で上書きするためのタイマー
+	let lastResultTime = 0;
+	let overwriteNext = false;
+	let silenceTimeout: ReturnType<typeof setTimeout> | null = null;
+
+	function resetSilenceTimer() {
+		if (silenceTimeout) clearTimeout(silenceTimeout);
+		silenceTimeout = setTimeout(() => {
+			overwriteNext = true;
+		}, 3000);
+	}
+
 	onMount(() => {
 		const SpeechRecognition =
 			(window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -23,6 +36,14 @@
 
 		recognition.onresult = (event: SpeechRecognitionEvent) => {
 			let interim = '';
+			const now = Date.now();
+			// 3秒以上空いていたら上書き
+			if (overwriteNext) {
+				transcript = '';
+				overwriteNext = false;
+			}
+			resetSilenceTimer();
+			lastResultTime = now;
 			for (let i = event.resultIndex; i < event.results.length; ++i) {
 				const result = event.results[i];
 				if (result.isFinal) {
@@ -37,9 +58,11 @@
 
 		recognition.onstart = () => {
 			recognizing = true;
+			resetSilenceTimer();
 		};
 		recognition.onend = () => {
 			recognizing = false;
+			if (silenceTimeout) clearTimeout(silenceTimeout);
 		};
 	});
 
@@ -47,6 +70,7 @@
 		if (recognition && recognizing) {
 			recognition.stop();
 		}
+		if (silenceTimeout) clearTimeout(silenceTimeout);
 	});
 
 	let displayText = '';
