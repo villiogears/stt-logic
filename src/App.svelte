@@ -116,6 +116,18 @@
 
 	let displayText = '';
 
+	$: textLength = displayText.length;
+	$: normalTextFontSize =
+		textLength > 180 ? '0.85rem' : textLength > 120 ? '0.95rem' : textLength > 70 ? '1rem' : '1.1rem';
+	$: fullscreenTextFontSize =
+		textLength > 220
+			? 'clamp(1.2rem, 2.6vw, 2rem)'
+			: textLength > 150
+				? 'clamp(1.4rem, 3.2vw, 2.8rem)'
+				: textLength > 90
+					? 'clamp(1.8rem, 4.2vw, 3.8rem)'
+					: 'clamp(2rem, 6vw, 5rem)';
+
 	function startRecognition() {
 		if (recognition && !recognizing) {
 			transcript = '';
@@ -177,7 +189,9 @@
 
 				<div style="margin-top: 1.5rem; padding: 1.5rem; border: 2px solid #00d4ff; border-radius: 0.75rem; min-height: 8rem; background: rgba(0, 212, 255, 0.05);">
 					{#if displayText}
-						<span style="color: #00d4ff; font-size: 1.1rem; line-height: 1.8; word-wrap: break-word;">{displayText}</span>
+						<span style={`color: #00d4ff; font-size: ${normalTextFontSize}; line-height: 1.8; word-wrap: break-word;`}>
+							{displayText}
+						</span>
 					{:else}
 						<span style="color: #5a5a7a; font-style: italic;">ここに音声が文字起こしされます</span>
 					{/if}
@@ -202,7 +216,7 @@
 
 			<div style="max-width: 92vw; text-align: center;">
 				{#if displayText}
-					<span style="color: #00d4ff; font-size: clamp(2rem, 6vw, 5rem); line-height: 1.5; word-wrap: break-word;">
+					<span style={`color: #00d4ff; font-size: ${fullscreenTextFontSize}; line-height: 1.5; word-wrap: break-word;`}>
 						{displayText}
 					</span>
 				{:else}
