@@ -116,6 +116,11 @@
 		recognitionInstance.onend = () => {
 			recognizing = false;
 			if (silenceTimeout) clearTimeout(silenceTimeout);
+
+			// Automatically restart recognition if it stops unexpectedly
+			if (recognition) {
+				recognition.start();
+			}
 		};
 	});
 
@@ -262,4 +267,4 @@ button:not(:disabled):hover {
 	transform: translate(0, -2px);
 }
 
-</style>	
+</style>
