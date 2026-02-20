@@ -117,8 +117,8 @@
 			recognizing = false;
 			if (silenceTimeout) clearTimeout(silenceTimeout);
 
-			// Automatically restart recognition if it stops unexpectedly
-			if (recognition) {
+			// Restart only if not manually stopped
+			if (recognition && !manualStop) {
 				recognition.start();
 			}
 		};
@@ -149,6 +149,8 @@
 					? 'clamp(1.8rem, 4.2vw, 3.8rem)'
 					: 'clamp(2rem, 6vw, 5rem)';
 
+	let manualStop = false; // Flag to prevent auto-restart
+
 	function startRecognition() {
 		if (recognition && !recognizing) {
 			transcript = '';
@@ -159,9 +161,10 @@
 	}
 	function stopRecognition() {
 		if (recognition && recognizing) {
+			manualStop = true; // Set flag to indicate manual stop
 			recognition.stop();
-			recognizing = false; // Ensure recognizing state is updated immediately
-			if (silenceTimeout) clearTimeout(silenceTimeout); // Clear any active timers
+			recognizing = false;
+			if (silenceTimeout) clearTimeout(silenceTimeout);
 		}
 	}
 </script>
