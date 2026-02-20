@@ -160,6 +160,8 @@
 	function stopRecognition() {
 		if (recognition && recognizing) {
 			recognition.stop();
+			recognizing = false; // Ensure recognizing state is updated immediately
+			if (silenceTimeout) clearTimeout(silenceTimeout); // Clear any active timers
 		}
 	}
 </script>
