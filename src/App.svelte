@@ -29,6 +29,17 @@
 	// 3秒以上空いたら次の音声で上書きするためのタイマー
 	let overwriteNext = false;
 	let silenceTimeout: ReturnType<typeof setTimeout> | null = null;
+	let previousInterim = '';
+
+	function mergeLongSound(finalText: string, interimText: string) {
+		const finalTrimmed = finalText.trim();
+		const interimTrimmed = interimText.trim();
+		if (!finalTrimmed || !interimTrimmed) return finalText;
+		if (!interimTrimmed.startsWith(finalTrimmed)) return finalText;
+		const suffix = interimTrimmed.slice(finalTrimmed.length);
+		if (!/^ー+$/.test(suffix)) return finalText;
+		return `${finalText}${suffix}`;
+	}
 
 	function resetSilenceTimer() {
 		if (silenceTimeout) clearTimeout(silenceTimeout);
@@ -85,10 +96,15 @@
 			for (let i = event.resultIndex; i < event.results.length; ++i) {
 				const result = event.results[i];
 				if (result.isFinal) {
-					transcript += result[0].transcript;
+					const finalText = mergeLongSound(result[0].transcript, previousInterim);
+					transcript += finalText;
+					previousInterim = '';
 				} else {
 					interim += result[0].transcript;
 				}
+			}
+			if (interim) {
+				previousInterim = interim;
 			}
 			displayText = transcript + interim;
 		};
@@ -132,6 +148,7 @@
 		if (recognition && !recognizing) {
 			transcript = '';
 			displayText = '';
+			previousInterim = '';
 			recognition.start();
 		}
 	}
