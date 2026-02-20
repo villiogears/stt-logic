@@ -17,6 +17,7 @@
 	let recognition: BrowserSpeechRecognition | null = null;
 	let appContainer: HTMLElement | null = null;
 	let isFullscreenMode = false;
+	let sentencePauseMs = 3000;
 
 	// 型定義
 	type SpeechRecognitionType = typeof window & {
@@ -26,7 +27,6 @@
 
 
 	// 3秒以上空いたら次の音声で上書きするためのタイマー
-	let lastResultTime = 0;
 	let overwriteNext = false;
 	let silenceTimeout: ReturnType<typeof setTimeout> | null = null;
 
@@ -36,7 +36,7 @@
 			overwriteNext = true;
 			transcript = '';
 			displayText = '';
-		}, 3000);
+		}, sentencePauseMs);
 	}
 
 	function handleFullscreenChange() {
@@ -76,14 +76,12 @@
 
 		recognitionInstance.onresult = (event: any) => {
 			let interim = '';
-			const now = Date.now();
 			// 3秒以上空いていたら上書き
 			if (overwriteNext) {
 				transcript = '';
 				overwriteNext = false;
 			}
 			resetSilenceTimer();
-			lastResultTime = now;
 			for (let i = event.resultIndex; i < event.results.length; ++i) {
 				const result = event.results[i];
 				if (result.isFinal) {
@@ -160,6 +158,21 @@
 					>
 						全画面表示
 					</button>
+				</div>
+
+				<div style="margin-bottom: 1.5rem;">
+					<label for="sentence-delay" style="display: block; color: #b0b0b0; font-size: 0.95rem; margin-bottom: 0.5rem; text-align: center;">
+						次の文章に移るまで: <span style="color: #00d4ff; font-weight: 600;">{(sentencePauseMs / 1000).toFixed(1)}秒</span>
+					</label>
+					<input
+						id="sentence-delay"
+						type="range"
+						min="1000"
+						max="10000"
+						step="500"
+						bind:value={sentencePauseMs}
+						style="width: 100%; accent-color: #00d4ff;"
+					/>
 				</div>
 
 				<div style="margin-top: 1.5rem; padding: 1.5rem; border: 2px solid #00d4ff; border-radius: 0.75rem; min-height: 8rem; background: rgba(0, 212, 255, 0.05);">
