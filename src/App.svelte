@@ -136,7 +136,7 @@
 	{#if !isFullscreenMode}
 		<main style="background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); color: #e0e0e0; min-height: 100vh; display: flex; flex-direction: column; align-items: center; justify-content: center; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;">
 			<div style="max-width: 600px; width: 90%; padding: 2rem;">
-				<h1 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 700; text-align: center; color: #00d4ff;">音声認識デモ</h1>
+				<h1 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 700; text-align: center; color: #00d4ff;">音声認識</h1>
 				<p style="text-align: center; color: #b0b0b0; margin-bottom: 2rem; font-size: 0.95rem;">Web Speech API</p>
 
 				<div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; flex-wrap: wrap;">
