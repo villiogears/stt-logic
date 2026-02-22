@@ -157,6 +157,8 @@
 			if (recognition && !manualStop) {
 				recognition.start();
 			}
+			// manualStopをリセット（stopRecognition後の再開を確実にする）
+			manualStop = false;
 		};
 	});
 
