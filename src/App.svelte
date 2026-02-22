@@ -190,6 +190,7 @@
 
 	function startRecognition() {
 		if (recognition && !recognizing) {
+			manualStop = false; // 停止後の再開を許可
 			transcript = '';
 			displayText = '';
 			previousInterim = '';
