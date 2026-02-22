@@ -110,16 +110,22 @@
 		};
 
 		recognitionInstance.onstart = () => {
-			recognizing = true;
+			recognizing = true; // Ensure recognizing is updated only when recognition actually starts
 			resetSilenceTimer();
+			console.log('Recognition started'); // Debug log
 		};
 		recognitionInstance.onend = () => {
-			recognizing = false;
+			recognizing = false; // Ensure recognizing is updated when recognition stops
 			if (silenceTimeout) clearTimeout(silenceTimeout);
 
 			// Restart only if not manually stopped
 			if (recognition && !manualStop) {
-				recognition.start();
+				try {
+					recognition.start();
+					console.log('Recognition auto-restarted'); // Debug log
+				} catch (error) {
+					console.error('Failed to auto-restart recognition:', error); // Log error for debugging
+				}
 			}
 		};
 	});
@@ -152,19 +158,32 @@
 	let manualStop = false; // Flag to prevent auto-restart
 
 	function startRecognition() {
+		console.log('Start button clicked'); // Debug log
 		if (recognition && !recognizing) {
+			manualStop = false; // Reset manual stop flag when starting recognition
 			transcript = '';
 			displayText = '';
 			previousInterim = '';
-			recognition.start();
+			try {
+				recognition.start();
+				console.log('Recognition start requested'); // Debug log
+			} catch (error) {
+				console.error('Failed to start recognition:', error); // Log error for debugging
+			}
+		} else {
+			console.warn('Recognition not started: already recognizing or not initialized'); // Debug log
 		}
 	}
 	function stopRecognition() {
+		console.log('Stop button clicked'); // Debug log
 		if (recognition && recognizing) {
 			manualStop = true; // Set flag to indicate manual stop
 			recognition.stop();
 			recognizing = false;
 			if (silenceTimeout) clearTimeout(silenceTimeout);
+			console.log('Recognition stopped'); // Debug log
+		} else {
+			console.warn('Recognition not stopped: not recognizing or not initialized'); // Debug log
 		}
 	}
 </script>
@@ -179,14 +198,14 @@
 				<div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; flex-wrap: wrap;">
 					<button
 						on:click={startRecognition}
-						disabled={recognizing}
+						disabled={recognizing} // Ensure button is only disabled when recognizing
 						style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #00d4ff, #0099ff); color: #000; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 1rem;"
 					>
 						開始
 					</button>
 					<button
 						on:click={stopRecognition}
-						disabled={!recognizing}
+						disabled={!recognizing} // Ensure button is only disabled when not recognizing
 						style="padding: 0.75rem 1.5rem; background: linear-gradient(135deg, #ff6b6b, #ee5a52); color: #fff; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: all 0.3s ease; font-size: 1rem;"
 					>
 						停止
