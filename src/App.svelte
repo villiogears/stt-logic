@@ -3,6 +3,12 @@
 	let transcript = '';
 	let recognizing = false;
 
+	// キーバインド設定用変数
+	let startKey = 's'; // デフォルト: sキー
+	let stopKey = 'd';  // デフォルト: dキー
+	let keyBindInputMode: 'none' | 'start' | 'stop' = 'none';
+	let tempKey = '';
+
 	type BrowserSpeechRecognition = {
 		lang: string;
 		continuous: boolean;
@@ -24,6 +30,34 @@
 		SpeechRecognition?: any;
 		webkitSpeechRecognition?: any;
 	};
+
+	function handleKeyBindInput(e: KeyboardEvent) {
+		// キーバインド設定モード時
+		if (keyBindInputMode !== 'none') {
+			// 英数字・記号・ファンクションキーのみpreventDefault（Tab, Enter, Escなどは除外）
+			// ただし、設定用キーは全て受け付ける
+			tempKey = e.key;
+			// 例: Tab, Enter, Shift, Control, Alt, Escape などはUI操作に影響するので除外
+			const ignoreKeys = ['Tab', 'Enter', 'Escape', 'Shift', 'Control', 'Alt', 'Meta', 'ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'];
+			if (!ignoreKeys.includes(tempKey)) {
+				e.preventDefault();
+			}
+			if (keyBindInputMode === 'start') {
+				startKey = tempKey;
+			} else if (keyBindInputMode === 'stop') {
+				stopKey = tempKey;
+			}
+			keyBindInputMode = 'none';
+			return;
+		}
+		// 通常時: キーバインドで開始・停止
+		if (e.target instanceof HTMLElement && ['INPUT', 'TEXTAREA'].includes(e.target.tagName)) return;
+		if (e.key === startKey && !recognizing) {
+			startRecognition();
+		} else if (e.key === stopKey && recognizing) {
+			stopRecognition();
+		}
+	}
 
 
 	// 3秒以上空いたら次の音声で上書きするためのタイマー
@@ -72,6 +106,8 @@
 
 	onMount(() => {
 		document.addEventListener('fullscreenchange', handleFullscreenChange);
+		// キーバインド用イベントリスナー
+		window.addEventListener('keydown', handleKeyBindInput);
 
 		const SpeechRecognitionCtor =
 			(window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
@@ -130,6 +166,7 @@
 		}
 		if (silenceTimeout) clearTimeout(silenceTimeout);
 		document.removeEventListener('fullscreenchange', handleFullscreenChange);
+		window.removeEventListener('keydown', handleKeyBindInput);
 		if (document.fullscreenElement === appContainer) {
 			document.exitFullscreen();
 		}
@@ -175,6 +212,23 @@
 			<div style="max-width: 600px; width: 90%; padding: 2rem;">
 				<h1 style="font-size: 2.5rem; margin-bottom: 1.5rem; font-weight: 700; text-align: center; color: #00d4ff;">音声認識</h1>
 				<p style="text-align: center; color: #b0b0b0; margin-bottom: 2rem; font-size: 0.95rem;">Web Speech API</p>
+
+				<!-- キーバインド設定UI -->
+				<div style="margin-bottom: 1.2rem; text-align: center;">
+					<label style="color: #b0b0b0; font-size: 0.95rem; margin-right: 1rem;">
+						開始キー: <span style="color: #00d4ff; font-weight: 600;">{startKey}</span>
+						<button style="margin-left: 0.5rem; padding: 0.3rem 0.7rem; font-size: 0.9rem; border-radius: 0.3rem; border: none; background: #222; color: #fff; cursor: pointer;" on:click={() => { keyBindInputMode = 'start'; tempKey = ''; }}>変更</button>
+					</label>
+					<label style="color: #b0b0b0; font-size: 0.95rem; margin-left: 1rem;">
+						停止キー: <span style="color: #ff6b6b; font-weight: 600;">{stopKey}</span>
+						<button style="margin-left: 0.5rem; padding: 0.3rem 0.7rem; font-size: 0.9rem; border-radius: 0.3rem; border: none; background: #222; color: #fff; cursor: pointer;" on:click={() => { keyBindInputMode = 'stop'; tempKey = ''; }}>変更</button>
+					</label>
+					{#if keyBindInputMode !== 'none'}
+						<div style="margin-top: 0.7rem; color: #b0b0b0; font-size: 0.95rem;">
+							新しいキーを押してください...
+						</div>
+					{/if}
+				</div>
 
 				<div style="display: flex; gap: 1rem; margin-bottom: 2rem; justify-content: center; flex-wrap: wrap;">
 					<button
